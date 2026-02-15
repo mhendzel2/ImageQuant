@@ -1,0 +1,96 @@
+protocol_id: nuclei_count_intensity_2d
+name: "2D Nuclei Count + Nuclear Intensity"
+version: "1.0.0"
+release_status: "released"
+
+required_channels:
+  - role: NUCLEUS
+    description: "DNA stain (DAPI/Hoechst)"
+    required: true
+  - role: MARKER_1
+    description: "Optional nuclear marker channel"
+    required: false
+
+supported_data:
+  allow_2d: true
+  allow_3d: false
+  allow_time: false
+  voxel_size_bounds:
+    xy_um_min: 0.02
+    xy_um_max: 2.0
+
+steps:
+  - id: normalize_for_segmentation
+    type: preprocess.segmentation_normalize
+    params:
+      percentile_min: 1.0
+      percentile_max: 99.8
+
+  - id: segment_nuclei
+    type: segmentation.nuclei.cellpose
+    params:
+      model: "nuclei"
+      diameter_um: 10.0
+      flow_threshold: 0.4
+      cellprob_threshold: 0.0
+      use_gpu_if_available: true
+
+  - id: measure_background
+    type: measurement.local_annulus_background
+    params:
+      inner_um: 1.0
+      outer_um: 3.0
+      exclude_other_nuclei: true
+      statistic: "median"
+
+  - id: measure_nuclei
+    type: measurement.nuclei_intensity
+    params:
+      intensity_stats: ["mean", "integrated"]
+      channels: ["NUCLEUS", "MARKER_1"]
+
+qc_gates:
+  - id: qc.metadata.pixel_size_present
+    type: qc.metadata.pixel_size_present
+    severity: "FAIL"
+
+  - id: qc.saturation.nucleus
+    type: qc.saturation_fraction
+    severity: "FAIL"
+    params:
+      channel: "NUCLEUS"
+      fail_gt: 0.005
+
+  - id: qc.seg.nuclei.count_range
+    type: qc.nuclei_count_range
+    severity: "FAIL"
+    params:
+      min_per_image: 5
+      max_per_image: 2000
+
+  - id: qc.seg.nuclei.area_range
+    type: qc.nuclei_area_range
+    severity: "FAIL"
+    params:
+      area_um2_min: 10.0
+      area_um2_max: 400.0
+
+outputs:
+  excel:
+    filename_template: "{protocol_id}_{version}_{run_id}.xlsx"
+    sheets:
+      - name: "RunSummary"
+        table: "run_summary"
+      - name: "ImageSummary"
+        table: "image_summary"
+      - name: "Nuclei"
+        table: "nuclei_table"
+      - name: "QC"
+        table: "qc_table"
+      - name: "Provenance"
+        table: "provenance"
+  overlays:
+    save_per_image: true
+    outline_color: "auto"
+  report:
+    format: "html"

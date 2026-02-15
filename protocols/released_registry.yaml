@@ -1,0 +1,4 @@
+protocols:
+  - protocol_id: nuclei_count_intensity_2d
+    version: "1.0.0"
+    hash: "163c486abb37a0a5921b08b5ab23dcb309e9926d41f3ddc697d83dae648956e5"

@@ -1,0 +1,1 @@
+"""Napari GUI package."""

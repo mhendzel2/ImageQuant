@@ -1,0 +1,32 @@
+roles:
+  student:
+    allowed_protocols:
+      - nuclei_count_intensity_2d
+    export_rules:
+      allowed_statuses: ["PASS"]
+      allow_fail_override: false
+      require_override_reason: true
+    qc_threshold_overrides: {}
+    runner_editable_fields: []
+
+  instructor:
+    allowed_protocols:
+      - nuclei_count_intensity_2d
+    export_rules:
+      allowed_statuses: ["PASS", "WARN"]
+      allow_fail_override: true
+      require_override_reason: true
+    qc_threshold_overrides: {}
+    runner_editable_fields:
+      - preview_count
+
+  research:
+    allowed_protocols: []
+    export_rules:
+      allowed_statuses: ["PASS", "WARN"]
+      allow_fail_override: true
+      require_override_reason: true
+    qc_threshold_overrides: {}
+    runner_editable_fields:
+      - preview_count
+      - channel_map

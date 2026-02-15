@@ -1,0 +1,67 @@
+Metadata-Version: 2.1
+Name: protocolquant
+Version: 0.1.0
+Summary: Protocol-driven, QC-gated image quantification
+Author: ProtocolQuant Contributors
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy==2.1.3
+Requires-Dist: scipy==1.14.1
+Requires-Dist: pandas==2.2.3
+Requires-Dist: scikit-image==0.24.0
+Requires-Dist: pydantic==2.10.4
+Requires-Dist: tifffile==2024.9.20
+Requires-Dist: ome-types==0.5.3
+Requires-Dist: openpyxl==3.1.5
+Requires-Dist: jinja2==3.1.4
+Requires-Dist: matplotlib==3.9.2
+Requires-Dist: PyYAML==6.0.2
+Provides-Extra: segmentation-cellpose
+Requires-Dist: cellpose==3.0.11; extra == "segmentation-cellpose"
+Requires-Dist: torch==2.5.1; extra == "segmentation-cellpose"
+Provides-Extra: ui
+Requires-Dist: napari==0.5.6; extra == "ui"
+Requires-Dist: PyQt6==6.7.1; extra == "ui"
+Provides-Extra: dev
+Requires-Dist: pytest==8.3.4; extra == "dev"
+Requires-Dist: pytest-cov==6.0.0; extra == "dev"
+Requires-Dist: black==24.10.0; extra == "dev"
+Requires-Dist: ruff==0.8.2; extra == "dev"
+Requires-Dist: pre-commit==4.0.1; extra == "dev"
+Requires-Dist: mypy==1.13.0; extra == "dev"
+
+# ProtocolQuant
+
+Protocol-driven image quantification with strict QC gating, immutable protocol versions, and reproducible run bundles.
+
+## Quickstart
+
+```bash
+pip install -e .
+pip install -e ".[segmentation-cellpose]"  # optional
+pytest
+```
+
+Run:
+
+```bash
+protocolquant run \
+  --protocol protocols/nuclei_count_intensity_2d_v1.yaml \
+  --input <folder_or_files> \
+  --role student \
+  --policy configs/lab_policy.yaml \
+  --out runs/
+```
+
+## Napari Wizard
+
+Install UI extras and launch the wizard:
+
+```bash
+pip install -e ".[ui]"
+protocolquant gui
+```
+
+The wizard provides file/folder pickers, run options, channel mapping, and executes
+`run_protocol` in a background thread so the Napari UI stays responsive.
